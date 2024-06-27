@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 const testCases = [
   {
@@ -53,28 +53,21 @@ test.describe('Asana Data-Driven Tests', () => {
         await page.goto("https://app.asana.com/-/login");
         await page.locator(`input[type="email"]`).fill("ben+pose@workwithloop.com");
         await page.getByRole('button', {name: "Continue", exact:true}).click();
-        
+
         await page.locator(`input[type="password"]`).fill("Password123");
         await page.getByRole('button', {name: "Log in", exact:true}).click()
-        
-        //todo: validate successful login
-        // await expect(page.getByText('Welcome, John', { exact: true })).toBeVisible();
-      });
+              });
 
       await test.step('Navigate to the project page', async () => {
         // Navigate to the project page
-        const navButton = await page.locator(`.SidebarNavigationLinkCard:has-text('${data.leftNav}')`);
-        await navButton.waitFor({state: 'visible'});
-        await navButton.click()
-        //todo: asssert I'm here
+        await page.locator(`.SidebarNavigationLinkCard:has-text('${data.leftNav}')`).click();
       });
 
       await test.step('Verify the card is within the right column', async () => {
         // Verify the card is within the right column
-        // const columnHeader = await page.getByText(data.column.replace("\s", "&nbsp"));
-        // const columnHeaderAncestor = await columnHeader.locator('xpath=ancestor::div[contains(@class, "BoardColumn BoardBody-column")]')
-        // const cardSpan = columnHeaderAncestor.getByText(data.card_title)
-        // expect(cardSpan.locator('xpath=ancestor::div[contains(@class, "ThemeableDraggableCardPresentation--isClickable"]')).toExist()
+        const columnHeaderAncestor = await page.locator(`.BoardBody-columnDraggableItemWrapper:has-text('${data.column.replace("\\s", "&nbsp")}')`)
+        const card = await columnHeaderAncestor.locator(`.BoardCardLayout-title:has-text('${data.card_title}')`,)
+        await expect(card).toHaveCount(1, {timeout: 10000})
       });
       
     });
